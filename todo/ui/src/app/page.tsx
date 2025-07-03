@@ -1,103 +1,175 @@
-import Image from "next/image";
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { FormLabel } from "@/components/ui/form";
+import { FormControl } from "@/components/ui/form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { Loader2, Pencil, Plus, Trash2 } from "lucide-react";
+import { useContext, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import requests from "@/services/api";
+
+
+const schema = yup.object({
+  id: yup.number().nullable().notRequired().default(null),
+  title: yup.string().required("Título é obrigatório"),
+  completed: yup.boolean().notRequired().default(false),
+  createdAt: yup.date().notRequired().default(null),
+  updatedAt: yup.date().notRequired().default(null),
+});
+
+type FormData = yup.InferType<typeof schema>;
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [todos, setTodos] = useState<FormData[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+  const form = useForm<FormData>({
+    resolver: yupResolver(schema),
+  });
+
+  useEffect(() => {
+    const fetchTodos = async () => {
+      const res = await requests.getTodos();
+      console.log(res.data);
+      setTodos(res.data);
+    };
+    fetchTodos();
+  }, []);
+
+  const onSubmitCreate = async (data: FormData) => {
+    try {
+      setIsLoading(true);
+      const res = await requests.createTodo(data)
+      setTodos([...todos, res.data]);
+      form.reset();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const onSubmitUpdate = async (id: number, data: FormData) => {
+    try {
+      setTodos(todos.map((todo) => todo.id === id ? data : todo));
+      await requests.updateTodo(id, data);
+      form.reset();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const onSubmit = async (data: FormData) => {
+    const id = form.getValues("id");
+    if (id) {
+      onSubmitUpdate(id, data);
+    } else {
+      onSubmitCreate(data);
+    }
+  }
+
+  const handleDelete = async (id: number) => {
+    try {
+      setTodos(todos.filter((todo) => todo.id !== id));
+      await requests.deleteTodo(id);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
+  const onClickUpdate = (id: number, data: FormData) => {
+    form.setValue("id", id);
+    form.setValue("title", data.title);
+    form.setValue("completed", data.completed);
+    form.setValue("createdAt", data.createdAt);
+    form.setValue("updatedAt", data.updatedAt);
+  }
+
+  return (
+    <div className="flex flex-col gap-4 items-center justify-start  h-full">
+      <h1 className="text-2xl font-bold">Todos</h1>
+      <div className="flex gap-4">
+        <section className='rounded-md border border-gray-300 p-4 w-72'>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex gap-2">
+              <div className="flex flex-col gap-2">
+                <FormField control={form.control} name="title" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Título</FormLabel>
+                    <FormControl>
+                      <Input type="text" {...field} placeholder="Add a new todo" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <Button type="submit" disabled={isLoading} className="cursor-pointer">
+                  {
+                    isLoading ? (
+                      <Loader2 className="animate-spin" />
+                    ) : (
+                      <>
+                        {
+                          form.getValues("id") ? (
+                            <Pencil />
+                          ) : (
+                            <Plus />
+                          )
+                        }
+                        {form.getValues("id") ? "Atualizar" : "Adicionar"}
+                      </>
+                    )
+                  }
+                </Button>
+                {
+                  form.watch("id") && (
+                    <Button variant="outline" type="button" onClick={() => form.reset({
+                      id: null,
+                      title: "",
+                      completed: false,
+                      createdAt: null,
+                      updatedAt: null,
+                    })} disabled={isLoading}>
+                      <Trash2 />
+                      Limpar
+                    </Button>
+                  )
+                }
+              </div>
+            </form>
+          </Form>
+        </section>
+        <section className='rounded-md border border-gray-300 p-4 w-80'>
+          {
+            todos.length === 0 && (
+              <p className="text-sm text-gray-500">Nenhum todo encontrado</p>
+            )
+          }
+          <ul className="flex flex-col gap-2">
+            {todos.map((todo) => (
+              <li key={todo.id} className="flex justify-between items-center">
+                <span className="text-sm overflow-hidden text-ellipsis whitespace-nowrap">{todo.title}</span>
+                <div className="flex gap-2">
+                  <Button variant="default" onClick={() => onClickUpdate(todo.id!, todo)} disabled={isLoading} className="cursor-pointer">
+                    <Pencil />
+                  </Button>
+                  <Button variant="destructive" onClick={() => handleDelete(todo.id!)} disabled={isLoading} className="cursor-pointer">
+                    <Trash2 />
+                  </Button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
     </div>
   );
 }

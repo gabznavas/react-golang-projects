@@ -5,6 +5,7 @@ import (
 	models "api/models"
 	todoUsecases "api/usecases/todos"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -32,6 +33,7 @@ func main() {
 
 	// cria as rotas do gin e associa as rotas aos usecases
 	router := gin.Default()
+	router.Use(cors.Default())
 	router.POST("/api/v1/todos", todoController.NewCreateTodoController(createTodoUsecase).CreateTodo)
 	router.GET("/api/v1/todos/:id", todoController.NewGetTodoController(getTodoUsecase).GetTodo)
 	router.DELETE("/api/v1/todos/:id", todoController.NewDeleteTodoController(deleteTodoUsecase).DeleteTodo)
