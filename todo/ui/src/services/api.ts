@@ -8,7 +8,7 @@ const requests = {
   getTodos: (offset: number = 0, limit: number = 10) => api.get(`/todos?offset=${offset}&limit=${limit}`),
   getTodo: (id: number) => api.get(`/todos/${id}`),
   createTodo: (data: { title: string }) => api.post("/todos", data),
-  updateTodo: (id: number, data: { title: string }) => api.put(`/todos/${id}`, data),
+  updateTodo: (id: number, data: { title: string, completed: boolean }) => api.put(`/todos/${id}`, data),
   deleteTodo: (id: number) => api.delete(`/todos/${id}`),
 }
 
