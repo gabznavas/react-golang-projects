@@ -15,7 +15,7 @@ func NewCreateProjectUsecase(db *gorm.DB) *CreateProjectUsecase {
 	return &CreateProjectUsecase{db: db}
 }
 
-func (u *CreateProjectUsecase) Execute(params dto.CreateProjectRequest) (*models.Project, error) {
+func (u *CreateProjectUsecase) Execute(params *dto.CreateProjectRequest) (*dto.ProjectResponse, error) {
 	project := models.Project{
 		Name:        params.Name,
 		Description: params.Description,
@@ -24,5 +24,9 @@ func (u *CreateProjectUsecase) Execute(params dto.CreateProjectRequest) (*models
 	if err != nil {
 		return nil, err
 	}
-	return &project, nil
+	return &dto.ProjectResponse{
+		ID:          project.ID,
+		Name:        project.Name,
+		Description: project.Description,
+	}, nil
 }

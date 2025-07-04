@@ -16,8 +16,8 @@ func NewCreateProjectController(createProjectUsecase *projectUsecase.CreateProje
 }
 
 func (c *CreateProjectController) CreateProject(ctx *gin.Context) {
-	var params dto.CreateProjectRequest
-	if err := ctx.ShouldBindJSON(&params); err != nil {
+	params := &dto.CreateProjectRequest{}
+	if err := ctx.ShouldBindBodyWithJSON(&params); err != nil {
 		ctx.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
