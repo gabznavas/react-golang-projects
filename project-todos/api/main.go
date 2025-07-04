@@ -21,19 +21,23 @@ func main() {
 	db.AutoMigrate(&models.Project{})
 
 	// Usecases
+	verifyAttributesUniqueUsecase := projectUsecase.NewVerifyAttributesUniqueUsecase(db)
 	getAllProjectsUsecase := projectUsecase.NewGetAllProjectsUsecase(db)
-	createProjectUsecase := projectUsecase.NewCreateProjectUsecase(db)
+	createProjectUsecase := projectUsecase.NewCreateProjectUsecase(db, verifyAttributesUniqueUsecase)
 	getProjectByIdUsecase := projectUsecase.NewGetProjectByIdUsecase(db)
+	updateProjectUsecase := projectUsecase.NewUpdateProjectUsecase(db, verifyAttributesUniqueUsecase)
 
 	// Controllers
 	getAllProjectsController := projectController.NewGetAllProjectsController(getAllProjectsUsecase)
 	createProjectController := projectController.NewCreateProjectController(createProjectUsecase)
 	getProjectByIdController := projectController.NewGetProjectByIdController(getProjectByIdUsecase)
+	updateProjectController := projectController.NewUpdateProjectController(updateProjectUsecase)
 
 	// Routes
 	router := gin.Default()
 	router.GET("api/v1/project", getAllProjectsController.GetAllProjects)
 	router.POST("api/v1/project", createProjectController.CreateProject)
 	router.GET("api/v1/project/:id", getProjectByIdController.GetProjectById)
+	router.PUT("api/v1/project/:id", updateProjectController.UpdateProject)
 	router.Run(":8080")
 }

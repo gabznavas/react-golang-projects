@@ -21,7 +21,7 @@ func (u *GetProjectByIdUsecase) Execute(id uint) (*dto.ProjectResponse, error) {
 	err := u.db.First(&project, id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil
+			return nil, ErrProjectNotFound
 		}
 		return nil, err
 	}

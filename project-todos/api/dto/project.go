@@ -10,3 +10,8 @@ type ProjectResponse struct {
 	Name        string `json:"name"`
 	Description string `json:"description,omitempty"`
 }
+
+type UpdateProjectRequest struct {
+	Name        string `json:"name" binding:"omitempty"`
+	Description string `json:"description" binding:"omitempty"`
+}

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	projectUsecase "api/usecases/project"
+	"errors"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -23,11 +24,11 @@ func (c *GetProjectByIdController) GetProjectById(ctx *gin.Context) {
 	}
 	project, err := c.getProjectByIdUsecase.Execute(uint(projectId))
 	if err != nil {
+		if errors.Is(err, projectUsecase.ErrProjectNotFound) {
+			ctx.JSON(404, gin.H{"error": err.Error()})
+			return
+		}
 		ctx.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
-	if project == nil {
-		ctx.JSON(404, gin.H{"error": "Project not found"})
 		return
 	}
 	ctx.JSON(200, project)
