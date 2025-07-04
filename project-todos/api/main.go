@@ -23,14 +23,17 @@ func main() {
 	// Usecases
 	getAllProjectsUsecase := projectUsecase.NewGetAllProjectsUsecase(db)
 	createProjectUsecase := projectUsecase.NewCreateProjectUsecase(db)
+	getProjectByIdUsecase := projectUsecase.NewGetProjectByIdUsecase(db)
 
 	// Controllers
 	getAllProjectsController := projectController.NewGetAllProjectsController(getAllProjectsUsecase)
 	createProjectController := projectController.NewCreateProjectController(createProjectUsecase)
+	getProjectByIdController := projectController.NewGetProjectByIdController(getProjectByIdUsecase)
 
 	// Routes
 	router := gin.Default()
 	router.GET("api/v1/project", getAllProjectsController.GetAllProjects)
 	router.POST("api/v1/project", createProjectController.CreateProject)
+	router.GET("api/v1/project/:id", getProjectByIdController.GetProjectById)
 	router.Run(":8080")
 }
