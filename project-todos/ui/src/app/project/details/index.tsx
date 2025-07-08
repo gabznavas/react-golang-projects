@@ -4,11 +4,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { requests } from "@/services/api";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { toast } from "sonner"
+import { AxiosError } from "axios";
 
 interface ProjectFormData {
   name: string;
@@ -24,6 +26,7 @@ export default function ProjectDetails() {
   const params = useSearchParams();
   const id = params.get('id');
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<ProjectFormData>({
     resolver: yupResolver(schema),
@@ -47,16 +50,27 @@ export default function ProjectDetails() {
   }, [id, form]);
 
   const handleSave = async (formData: ProjectFormData) => {
-    const payload = {
-      name: formData.name,
-      description: formData.description
+    setIsLoading(true);
+    try {
+      const payload = {
+        name: formData.name,
+        description: formData.description
+      }
+      if (id) {
+        await requests.updateProject(id, payload);
+      } else {
+        await requests.createProject(payload);
+      }
+      router.push('/project/list');
+    } catch (error) {
+      if (error instanceof AxiosError && error.response?.data.error) {
+        toast.error(error.response.data.error, {
+          position: "top-center",
+        });
+      }
+    } finally {
+      setIsLoading(false);
     }
-    if (id) {
-      await requests.updateProject(id, payload);
-    } else {
-      await requests.createProject(payload);
-    }
-    router.push('/project/list');
   }
 
   return (
@@ -101,11 +115,12 @@ export default function ProjectDetails() {
               )}
             />
             <div className="flex gap-4 justify-end">
-              <Button variant="default" className="w-2/10 cursor-pointer">
+              <Button variant="default" className="w-2/10 cursor-pointer" disabled={isLoading}>
                 {id ? 'Atualizar' : 'Criar'}
               </Button>
               <Button variant="outline"
                 className="w-2/10 cursor-pointer"
+                disabled={isLoading}
                 type="button" onClick={() => router.push('/project/list')} >
                 Cancelar
               </Button>
