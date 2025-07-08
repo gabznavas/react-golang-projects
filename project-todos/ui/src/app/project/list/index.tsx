@@ -7,9 +7,11 @@ import { ProjectCard } from "@/components/project-card";
 import { useEffect, useState } from "react";
 import { requests } from "@/services/api";
 import { Project } from "@/services/types";
+import { useRouter } from "next/navigation";
 
 export default function ProjectList() {
   const [projects, setProjects] = useState<Project[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -29,14 +31,16 @@ export default function ProjectList() {
         <Button autoFocus variant="outline" className="flex items-center gap-2 w-1/6">
           <SearchIcon />
         </Button>
-        <Button variant="default" className="w-1/10">
+        <Button variant="default" className="w-1/10" onClick={() => {
+          router.push('/project/create');
+        }}>
           <PlusIcon />
         </Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-4 w-full">
         {
-          projects.map(project => (
-            <ProjectCard key={project.id} project={project} />
+          projects.map((project, index) => (
+            <ProjectCard key={index} project={project} />
           ))
         }
       </div>
