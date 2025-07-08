@@ -2,6 +2,7 @@ package controllers
 
 import (
 	projectUsecase "api/usecases/project"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,7 +16,16 @@ func NewGetAllProjectsController(getAllProjectsUsecase *projectUsecase.GetAllPro
 }
 
 func (c *GetAllProjectsController) GetAllProjects(ctx *gin.Context) {
-	projects, err := c.getAllProjectsUsecase.Execute()
+	search := ctx.Query("search")
+	offset, err := strconv.Atoi(ctx.Query("offset"))
+	if err != nil {
+		offset = 0
+	}
+	limit, err := strconv.Atoi(ctx.Query("limit"))
+	if err != nil {
+		limit = 10
+	}
+	projects, err := c.getAllProjectsUsecase.Execute(search, offset, limit)
 	if err != nil {
 		ctx.JSON(500, gin.H{"error": err.Error()})
 		return

@@ -8,8 +8,8 @@ const axiosInstance = axios.create({
 
 
 export const requests = {
-  getProjects: async () => {
-    const response = await axiosInstance.get("/project");
+  getProjects: async (params: { search: string, offset: number, limit: number }) => {
+    const response = await axiosInstance.get("/project", { params });
     return response.data;
   },
   getProjectById: async (id: string) => {

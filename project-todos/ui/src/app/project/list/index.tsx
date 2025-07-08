@@ -12,10 +12,20 @@ import { Form } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { AxiosError } from "axios";
+import { toast } from "sonner";
 
 const schema = yup.object().shape({
-  search: yup.string().nullable(),
+  search: yup.string(),
+  offset: yup.number(),
+  limit: yup.number(),
 });
+
+const defaultSearch = {
+  limit: 10,
+  offset: 0,
+  search: '',
+}
 
 type FormSchema = yup.InferType<typeof schema>;
 
@@ -25,7 +35,7 @@ export default function ProjectList() {
 
   useEffect(() => {
     const fetchProjects = async () => {
-      const projects = await requests.getProjects();
+      const projects = await requests.getProjects(defaultSearch);
       setProjects(prev => {
         const newProjects = projects.filter((project: Project) => !prev.some(p => p.id === project.id));
         return [...prev, ...newProjects];
@@ -40,10 +50,27 @@ export default function ProjectList() {
 
   const form = useForm({
     resolver: yupResolver(schema),
+    defaultValues: defaultSearch,
   });
 
-  const handleSearch = (formData: FormSchema) => {
-    alert(formData.search);
+  const handleSearch = async (formData: FormSchema) => {
+    try {
+      const projects = await requests.getProjects({
+        limit: formData.limit || defaultSearch.limit,
+        offset: formData.offset || defaultSearch.offset,
+        search: formData.search || defaultSearch.search,
+      });
+      setProjects(projects);
+    } catch (error) {
+      if (error instanceof AxiosError && error.response?.data.error) {
+        toast.error(error.response.data.error, {
+          position: "top-center",
+        });
+      }
+      toast.error("Erro ao buscar projetos", {
+        position: "top-center",
+      });
+    }
   }
 
   return (
@@ -67,6 +94,5 @@ export default function ProjectList() {
         }
       </div>
     </div>
-
   )
 }

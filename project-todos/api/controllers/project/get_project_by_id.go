@@ -28,6 +28,7 @@ func (c *GetProjectByIdController) GetProjectById(ctx *gin.Context) {
 			ctx.JSON(404, gin.H{"error": err.Error()})
 			return
 		}
+
 		ctx.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
