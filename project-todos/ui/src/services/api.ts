@@ -1,5 +1,4 @@
 import axios from "axios";
-import { Project } from "next/dist/build/swc/types";
 
 const API_URL = "http://localhost:8080/api/v1";
 
@@ -17,12 +16,12 @@ export const requests = {
     const response = await axiosInstance.get(`/project/${id}`);
     return response.data;
   },
-  createProject: async (project: Project) => {
-    const response = await axiosInstance.post("/project", project);
+  createProject: async (payload: { name: string, description: string }) => {
+    const response = await axiosInstance.post("/project", payload);
     return response.data;
   },
-  updateProject: async (id: string, project: Project) => {
-    const response = await axiosInstance.put(`/project/${id}`, project);
+  updateProject: async (id: string, payload: { name: string, description: string }) => {
+    const response = await axiosInstance.put(`/project/${id}`, payload);
     return response.data;
   },
   deleteProject: async (id: string) => {

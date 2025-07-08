@@ -39,8 +39,10 @@ func (u *CreateProjectUsecase) Execute(params *dto.CreateProjectRequest) (*dto.P
 		return nil, err
 	}
 	return &dto.ProjectResponse{
-		ID:          project.ID,
+		Id:          project.ID,
 		Name:        project.Name,
 		Description: project.Description,
+		CreatedAt:   project.CreatedAt,
+		UpdatedAt:   project.UpdatedAt,
 	}, nil
 }

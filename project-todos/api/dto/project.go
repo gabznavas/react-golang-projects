@@ -1,14 +1,18 @@
 package dto
 
+import "time"
+
 type CreateProjectRequest struct {
 	Name        string `json:"name" binding:"required"`
 	Description string `json:"description" binding:"omitempty"`
 }
 
 type ProjectResponse struct {
-	ID          uint   `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description,omitempty"`
+	Id          uint      `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description,omitempty"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
 type UpdateProjectRequest struct {

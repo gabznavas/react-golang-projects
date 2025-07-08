@@ -11,10 +11,14 @@ type Props = {
 export const ProjectCard = ({ project }: Props) => {
   const router = useRouter();
 
+  const handleOnClick = () => {
+    router.push(`/project/details?id=${project.id}`);
+  }
+
   return (
     <Card
       className="min-w-[320px] h-[300px] cursor-pointer hover:shadow-lg transition-all duration-300"
-      onClick={() => router.push(`/project/details?id=${project.id}`)}>
+      onClick={() => handleOnClick()}>
       <CardHeader>
         <CardTitle>{project.name}</CardTitle>
       </CardHeader>

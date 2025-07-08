@@ -1,5 +1,5 @@
 export type Project = {
-  id: number;
+  id: undefined;
   name: string;
   description: string;
   createdAt: string;
