@@ -5,6 +5,7 @@ import (
 	"api/models"
 	projectUsecase "api/usecases/project"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -37,6 +38,7 @@ func main() {
 
 	// Routes
 	router := gin.Default()
+	router.Use(cors.Default())
 	router.GET("api/v1/project", getAllProjectsController.GetAllProjects)
 	router.POST("api/v1/project", createProjectController.CreateProject)
 	router.GET("api/v1/project/:id", getProjectByIdController.GetProjectById)
