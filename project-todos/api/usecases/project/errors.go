@@ -3,6 +3,6 @@ package usecases
 import "errors"
 
 var (
-	ErrProjectNotFound      = errors.New("project not found")
-	ErrProjectAlreadyExists = errors.New("project already exists")
+	ErrProjectNotFound      = errors.New("Projeto não encontrado.")
+	ErrProjectAlreadyExists = errors.New("Projeto já existe com esse nome.")
 )
