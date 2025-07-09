@@ -93,6 +93,15 @@ export default function ProjectList() {
           ))
         }
       </div>
+      <div className="flex gap-1 justify-center items-center ">
+        {
+          new Array(10).fill(0).map((_, index) => (
+            <div key={index} className="flex items-center justify-center text-sm text-gray-600 w-10 h-10 bg-gray-200 animate-pulse rounded-md">
+              {index + 1}
+            </div>
+          ))
+        }
+      </div>
     </div>
   )
 }
