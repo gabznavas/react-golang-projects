@@ -73,6 +73,10 @@ export default function ProjectList() {
     }
   }
 
+  const handleDeleteProject = (id: string) => {
+    setProjects(prev => prev.filter(project => project.id !== id));
+  }
+
   return (
     <div className="flex flex-col gap-4 mx-auto">
       <Form {...form}>
@@ -89,7 +93,7 @@ export default function ProjectList() {
       <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-4 w-full">
         {
           projects.map((project, index) => (
-            <ProjectCard key={index} project={project} />
+            <ProjectCard key={index} project={project} onDelete={handleDeleteProject} />
           ))
         }
       </div>
